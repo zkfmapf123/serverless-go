@@ -1,7 +1,7 @@
 # Serverless-go-deploy-agent
 
-## Todo
+## 기능
 
-- [ ] init Cli Template
-- [ ] Make Golang-Serverless Template
-- [ ] Deploy Lambda
+- Lambda Dashboard
+- Deploy
+- Rollback

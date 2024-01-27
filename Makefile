@@ -6,3 +6,9 @@ dev:
 	
 run:
 	./main
+
+test:
+	go test ./...
+
+test-w:
+	gow test -v
