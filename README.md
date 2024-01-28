@@ -3,13 +3,22 @@
 ## 초기설정
 
 ```sh
+  make build
+
   ## help
   ./main
 
   ## command
-  ## profile, region 미기재시 ~/.aws/credential의 Default로 동작합니다.
-  ./main [command] -p [profile] -r [region]
+  ./main [command] -p [profile] -r [region] -f [function path]
 ```
+
+## Default Parameter
+
+|     | 설명               | 기본값         |
+| --- | ------------------ | -------------- |
+| -p  | profile            | default        |
+| -r  | region             | ap-northeast-2 |
+| -f  | function root path | functions      |
 
 ## 완료된 기능
 
