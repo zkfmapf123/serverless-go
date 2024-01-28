@@ -1,8 +1,8 @@
 build:
-	@cd exec && go build -o ../main main.go
+	@cd exec && go build -o ../agent agent.go
 
 run: build
-	./main
+	./agent
 
 test:
 	@cd exec && go test ./...
