@@ -1,14 +1,11 @@
 build:
-	@go build -o main ./bin/main.go
+	@cd exec && go build -o ../main main.go
 
-dev:
-	@go run ./bin/main.go
-	
-run:
+run: build
 	./main
 
 test:
-	go test ./...
+	@cd exec && go test ./...
 
 test-w:
-	gow test -v
+	@cd exec && gow test -v
