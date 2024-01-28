@@ -12,8 +12,10 @@ import (
 )
 
 var (
-	PROFILE = "default"
-	REGION  = "ap-northeast-2"
+	PROFILE    = "default"
+	REGION     = "ap-northeast-2"
+	PATH       = "functions"
+	YML_PREFIX = "agent"
 )
 
 var rootCmd = &cobra.Command{
@@ -30,14 +32,33 @@ func Execute() error {
 func initial() {
 	cobra.OnInitialize(initConfig)
 
-	rootCmd.PersistentFlags().StringP("profile", "p", "", "[Required] aws profile")
-	rootCmd.PersistentFlags().StringP("region", "r", "", "[Required] aws region")
+	rootCmd.PersistentFlags().StringP("profile", "p", "", "[Optional] aws profile")
+	rootCmd.PersistentFlags().StringP("region", "r", "", "[Optional] aws region")
+	rootCmd.PersistentFlags().StringP("path", "f", "", "[Required] function path")
 
 	viper.BindPFlag("profile", rootCmd.PersistentFlags().Lookup("profile"))
 	viper.BindPFlag("region", rootCmd.PersistentFlags().Lookup("region"))
+	viper.BindPFlag("path", rootCmd.PersistentFlags().Lookup("path"))
 }
 
 func initConfig() {
+
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
+	}
+
+	inspectParameter(homeDir, viper.GetString("profile"), viper.GetString("region"))
+
+	path, err := os.Getwd()
+	if err != nil {
+		panic(path)
+	}
+
+	inspectHomeYML(path, YML_PREFIX)
+}
+
+func inspectParameter(homeDir, profile, region string) {
 
 	// profile
 	viper.Set("profile", utils.InjectDefaultValueNotExist[string](viper.GetString("profile"), func(v string) bool {
@@ -57,10 +78,14 @@ func initConfig() {
 		return false
 	}, REGION))
 
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		panic(err)
-	}
+	// function path
+	viper.Set("path", utils.InjectDefaultValueNotExist[string](viper.GetString("path"), func(v string) bool {
+		if v != "" {
+			return true
+		}
+
+		return false
+	}, PATH))
 
 	configFilePath := filepath.Join(homeDir, ".aws", "credentials")
 	b, err := os.ReadFile(configFilePath)
@@ -70,5 +95,13 @@ func initConfig() {
 
 	if !strings.Contains(string(b), viper.GetString("profile")) {
 		panic(fmt.Sprintf("Not Exist Profile %s", viper.GetString("profile")))
+	}
+}
+
+func inspectHomeYML(execPath, ymlPrefix string) {
+
+	_, err := os.Stat(fmt.Sprintf("%s/%s.yml", execPath, ymlPrefix))
+	if err != nil {
+		panic(fmt.Sprintf("Does Not Exist %s.yml", ymlPrefix))
 	}
 }

@@ -11,13 +11,18 @@
   ./main [command] -p [profile] -r [region]
 ```
 
-## 기능
+## 완료된 기능
 
-- Lambda Dashboard
-  - Details...
-  - Logging On/Off
-  - URL
-  - Env
-- Deploy
-- Rollback
-- Delete
+- [x] Lambda Dashboard
+- [ ] Deploy Lambda
+- [ ] Rollback Lambda
+- [ ] Delete Lambda
+
+## 추후 추가되야 할 작업
+
+- Lambda를 만들어주는건 아직안됨 -> 테라폼으로 관리할수있도록 해야 함
+
+  - 테라폼으로 만들어주되, output 할 수 있도록
+  - state bucket도 yml에서 추출하자...
+
+- 현재는 S3 + zip 형태로 하지만, 추후에는 Dockerfile로도 배포할수있도록 해야함
