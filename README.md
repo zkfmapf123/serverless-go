@@ -6,10 +6,10 @@
   make build
 
   ## help
-  ./main
+  ./agent
 
   ## command
-  ./main [command] -p [profile] -r [region] -f [function path]
+  ./agent [command] -p [profile] -r [region] -f [function path]
 ```
 
 ## Default Parameter
