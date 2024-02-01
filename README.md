@@ -23,6 +23,8 @@
 ## 완료된 기능
 
 - [x] Lambda Dashboard
+- [ ] Create Lambda ( use Terraform )
+- [ ] Output Terraform in Lambda Function File
 - [ ] Deploy Lambda
 - [ ] Rollback Lambda
 - [ ] Delete Lambda
