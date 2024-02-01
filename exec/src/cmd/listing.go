@@ -29,7 +29,7 @@ var listingCmd = &cobra.Command{
 				envString := strconv.Itoa(v.Env)
 				sizeString := strconv.Itoa(int(v.Size))
 
-				return []string{k, v.Desc, envString, sizeString, v.LastUpdated}
+				return []string{k, v.Desc, envString, fmt.Sprintf("%s MB", sizeString), v.LastUpdated}
 			})
 	},
 }

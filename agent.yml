@@ -2,3 +2,4 @@ configs:
   global_s3_bucket: example-labmda-s3-bucket
   profile: default
   region: ap-northeast-2
+  state_bucket: dk-s3-lambda-state
