@@ -1,11 +1,12 @@
 configs:
-  role_arn: ""
+  role_arn: Basic-Lambda-Role
+  function_name: add_function
 
 env:
-  a: ""
-  b: ""
-  c: ""
-  d: ""
+  a: 10
+  b: 20
+  c: 30
+  d: 40
 
 
 

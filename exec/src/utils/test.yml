@@ -1,0 +1,9 @@
+config:
+  role_arn: role_a
+  function_name: func_b
+
+env:
+  a: 10
+  b: 20
+  c: 30
+  d: 40

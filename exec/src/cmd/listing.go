@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zkfmapf123/serverless-go-deploy-agent/src/aws"
 	"github.com/zkfmapf123/serverless-go-deploy-agent/src/filesystem"
+	"github.com/zkfmapf123/serverless-go-deploy-agent/src/interaction"
 )
 
 var listingCmd = &cobra.Command{
@@ -34,11 +35,8 @@ var listingCmd = &cobra.Command{
 	},
 }
 
-func getLambdaList() {
-
-}
-
 func init() {
+	interaction.Clear()
 	rollbackCmd.Flags().String("list", "list", "")
 	rootCmd.AddCommand(listingCmd)
 }

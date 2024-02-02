@@ -3,6 +3,7 @@ package aws
 import (
 	"context"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
 	"github.com/aws/aws-sdk-go-v2/service/lambda/types"
 	"github.com/zkfmapf123/serverless-go-deploy-agent/src/utils"
@@ -13,6 +14,19 @@ type LambdaInfo struct {
 	Env         int
 	Size        float64
 	LastUpdated string
+}
+
+func (c AWSConfig) IsExistLambda(name string) bool {
+
+	input := &lambda.GetFunctionInput{
+		FunctionName: aws.String(name),
+	}
+	_, err := c.lambda.GetFunction(context.TODO(), input)
+	if err != nil {
+		return false
+	}
+
+	return true
 }
 
 func (c AWSConfig) GetLambdaList() map[string]LambdaInfo {
