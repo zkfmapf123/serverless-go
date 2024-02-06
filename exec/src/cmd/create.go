@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -25,12 +26,16 @@ var createCmd = &cobra.Command{
 
 		// get yml config
 		ymlConfig := utils.GetYmlProperties[FunctionConfig](fmt.Sprintf("%s/config.yml", functionPath))
+		profile, fnName, s3Name := viper.GetString("profile"), ymlConfig.Config.FunctionName, ymlConfig.Config.StateS3Bucket
 
-		// inspect lambda
-		cfg := aws.NewLambda(viper.GetString("profile"))
+		lambda, s3 := aws.NewLambda(profile), aws.NewS3(profile)
 
-		if cfg.API.IsExist(ymlConfig.Config.FunctionName) {
-			fmt.Printf("%s is Already Exist", ymlConfig.Config.FunctionName)
+		if lambda.API.IsExist(fnName) {
+			log.Fatalln(fmt.Sprintf("%s is Already Exist Lambda Function", ymlConfig.Config.FunctionName))
+		}
+
+		if !s3.API.IsExist(s3Name) {
+			log.Fatalln(fmt.Sprintf("%s is Not Exist S3 Bucket", ymlConfig.Config.StateS3Bucket))
 		}
 
 		/*
@@ -38,10 +43,6 @@ var createCmd = &cobra.Command{
 		*/
 
 	},
-}
-
-func createLambdaFunction() {
-
 }
 
 func init() {

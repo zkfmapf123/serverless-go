@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var TEST_PROFILE = "default"
+var TEST_PROFILE = "zkfmapf123"
 
 func TestGetLambdaList(t *testing.T) {
 	client := NewLambda(TEST_PROFILE)
