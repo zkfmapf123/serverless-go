@@ -1,7 +1,9 @@
 package filesystem
 
 import (
+	"fmt"
 	"os"
+	"strings"
 
 	"github.com/zkfmapf123/serverless-go-deploy-agent/src/interaction"
 	"github.com/zkfmapf123/serverless-go-deploy-agent/src/utils"
@@ -34,4 +36,36 @@ func SelectBoxDirectory(path string) (string, bool) {
 	newPath = utils.Concat(newPath, "/", entity)
 
 	return newPath, false
+}
+
+func IsExist(path, name string) bool {
+
+	entities, err := os.ReadDir(path)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, v := range entities {
+		if strings.Contains(v.Name(), name) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func InjectFileScript(path, filename, txt string) error {
+	file, err := os.Create(fmt.Sprintf("%s/%s", path, filename))
+	if err != nil {
+		return err
+	}
+
+	defer file.Close()
+
+	_, err = file.WriteString(txt)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

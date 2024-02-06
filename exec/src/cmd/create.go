@@ -27,9 +27,9 @@ var createCmd = &cobra.Command{
 		// get yml config
 		ymlConfig := utils.GetYmlProperties[FunctionConfig](fmt.Sprintf("%s/config.yml", functionPath))
 		profile, fnName, s3Name := viper.GetString("profile"), ymlConfig.Config.FunctionName, ymlConfig.Config.StateS3Bucket
-
 		lambda, s3 := aws.NewLambda(profile), aws.NewS3(profile)
 
+		// inspect configs
 		if lambda.API.IsExist(fnName) {
 			log.Fatalln(fmt.Sprintf("%s is Already Exist Lambda Function", ymlConfig.Config.FunctionName))
 		}
@@ -38,10 +38,16 @@ var createCmd = &cobra.Command{
 			log.Fatalln(fmt.Sprintf("%s is Not Exist S3 Bucket", ymlConfig.Config.StateS3Bucket))
 		}
 
-		/*
-			Terraform 활용해서 만들면 됨
-		*/
+		if filesystem.IsExist(functionPath, "terraform") {
+			log.Fatalln("Terraform 파일이 이미 존재합니다")
+		}
 
+		err := filesystem.InjectFileScript(functionPath, "main.tf", `
+			hello world
+		`)
+		if err != nil {
+			panic(err)
+		}
 	},
 }
 
