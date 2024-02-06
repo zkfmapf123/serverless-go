@@ -18,8 +18,8 @@ var listingCmd = &cobra.Command{
 	Long:  "List Lambda",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		cfg := aws.New(viper.GetString("profile"))
-		list := cfg.GetLambdaList()
+		cfg := aws.NewLambda(viper.GetString("profile"))
+		list := cfg.API.GetList()
 		if len(list) == 0 {
 			fmt.Println("Lambda List is Not Exists")
 			os.Exit(0)

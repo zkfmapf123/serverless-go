@@ -16,22 +16,28 @@ type LambdaInfo struct {
 	LastUpdated string
 }
 
-type LambdaConfig struct {
+type lambdaConfig struct {
 	config AWSConfig
 }
 
-func NewLambda(profile string) LambdaConfig {
-	return &LambdaHandler{
-		handler: New(profile),
+type NewLambdaAPI struct {
+	API IAWS[LambdaInfo]
+}
+
+func NewLambda(profile string) NewLambdaAPI {
+	return NewLambdaAPI{
+		API: lambdaConfig{
+			config: New(profile),
+		},
 	}
 }
 
-func (c AWSConfig) IsExist(name string) bool {
+func (l lambdaConfig) IsExist(name string) bool {
 
 	input := &lambda.GetFunctionInput{
 		FunctionName: aws.String(name),
 	}
-	_, err := c.lambda.GetFunction(context.TODO(), input)
+	_, err := l.config.lambda.GetFunction(context.TODO(), input)
 	if err != nil {
 		return false
 	}
@@ -39,10 +45,10 @@ func (c AWSConfig) IsExist(name string) bool {
 	return true
 }
 
-func (c AWSConfig) GetList() map[string]LambdaInfo {
+func (l lambdaConfig) GetList() map[string]LambdaInfo {
 
 	listInput := &lambda.ListFunctionsInput{}
-	res, err := c.lambda.ListFunctions(context.TODO(), listInput)
+	res, err := l.config.lambda.ListFunctions(context.TODO(), listInput)
 	if err != nil {
 		panic(err)
 	}

@@ -38,3 +38,7 @@
   - state bucket도 yml에서 추출하자...
 
 - 현재는 S3 + zip 형태로 하지만, 추후에는 Dockerfile로도 배포할수있도록 해야함
+
+## Dependency
+
+- <a href="https://registry.terraform.io/modules/zkfmapf123/lambda/lee/latest">Terraform Lambda Module</a>

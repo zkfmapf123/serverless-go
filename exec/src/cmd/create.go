@@ -27,8 +27,9 @@ var createCmd = &cobra.Command{
 		ymlConfig := utils.GetYmlProperties[FunctionConfig](fmt.Sprintf("%s/config.yml", functionPath))
 
 		// inspect lambda
-		cfg := aws.New(viper.GetString("profile"))
-		if cfg.IsExistLambda(ymlConfig.Config.FunctionName) {
+		cfg := aws.NewLambda(viper.GetString("profile"))
+
+		if cfg.API.IsExist(ymlConfig.Config.FunctionName) {
 			fmt.Printf("%s is Already Exist", ymlConfig.Config.FunctionName)
 		}
 

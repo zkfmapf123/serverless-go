@@ -1,13 +1,24 @@
+## Required
 configs:
+  state_s3_bucket: lambda-dk-s3-bucket
   role_arn: Basic-Lambda-Role
+  filename: function.zip
+  handler: handler.go
   function_name: add_function
 
-env:
+## Required
+handler_config:
+  timeout: 60
+  memory_size: 128
+  runtime: go1.20
+
+## Required
+tags:
+  Env: test
+
+## Required
+envs:
   a: 10
   b: 20
   c: 30
   d: 40
-
-
-
-

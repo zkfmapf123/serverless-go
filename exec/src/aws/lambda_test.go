@@ -9,8 +9,8 @@ import (
 var TEST_PROFILE = "default"
 
 func TestGetLambdaList(t *testing.T) {
-	client := New(TEST_PROFILE)
-	list := client.GetLambdaList()
+	client := NewLambda(TEST_PROFILE)
+	list := client.API.GetList()
 
 	if list == nil {
 		t.Errorf("%v is error", list)
@@ -18,10 +18,10 @@ func TestGetLambdaList(t *testing.T) {
 }
 
 func TestIsExist(t *testing.T) {
-	client := New(TEST_PROFILE)
+	client := NewLambda(TEST_PROFILE)
 
-	isExist_1 := client.IsExistLambda("bucket")
-	isExist_2 := client.IsExistLambda("bucket-aaa")
+	isExist_1 := client.API.IsExist("bucket")
+	isExist_2 := client.API.IsExist("bucket-aaa")
 
 	assert.Equal(t, isExist_1, true)
 	assert.Equal(t, isExist_2, false)
