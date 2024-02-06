@@ -25,7 +25,6 @@ var createCmd = &cobra.Command{
 
 		// get yml config
 		ymlConfig := utils.GetYmlProperties[FunctionConfig](fmt.Sprintf("%s/config.yml", functionPath))
-		fmt.Println(ymlConfig)
 
 		// inspect lambda
 		cfg := aws.New(viper.GetString("profile"))

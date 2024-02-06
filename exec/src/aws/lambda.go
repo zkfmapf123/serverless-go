@@ -16,7 +16,17 @@ type LambdaInfo struct {
 	LastUpdated string
 }
 
-func (c AWSConfig) IsExistLambda(name string) bool {
+type LambdaConfig struct {
+	config AWSConfig
+}
+
+func NewLambda(profile string) LambdaConfig {
+	return &LambdaHandler{
+		handler: New(profile),
+	}
+}
+
+func (c AWSConfig) IsExist(name string) bool {
 
 	input := &lambda.GetFunctionInput{
 		FunctionName: aws.String(name),
@@ -29,7 +39,7 @@ func (c AWSConfig) IsExistLambda(name string) bool {
 	return true
 }
 
-func (c AWSConfig) GetLambdaList() map[string]LambdaInfo {
+func (c AWSConfig) GetList() map[string]LambdaInfo {
 
 	listInput := &lambda.ListFunctionsInput{}
 	res, err := c.lambda.ListFunctions(context.TODO(), listInput)
