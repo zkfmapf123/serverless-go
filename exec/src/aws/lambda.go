@@ -97,6 +97,10 @@ func (l lambdaConfig) Create(info LambdaInfo) bool {
 	return true
 }
 
+func (l lambdaConfig) Retrieve(name string) map[string]LambdaInfo {
+	return nil
+}
+
 func getEnvSize(t *types.EnvironmentResponse) int {
 
 	if t == nil {

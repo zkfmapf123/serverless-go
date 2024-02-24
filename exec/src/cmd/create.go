@@ -29,10 +29,8 @@ var createCmd = &cobra.Command{
 		ymlConfig := utils.GetYmlProperties[FunctionConfig](fmt.Sprintf("%s/config.yml", functionPath))
 		globalConfig := utils.GetYmlProperties[GlobalConfig](fmt.Sprintf("%s/agent.yml", path))
 
-		fmt.Println(globalConfig)
-
 		profile, fnName, s3Name := viper.GetString("profile"), ymlConfig.Config.FunctionName, ymlConfig.Config.StateS3Bucket
-		lambda, s3 := aws.NewLambda(profile), aws.NewS3(profile)
+		lambda, s3, iam := aws.NewLambda(profile), aws.NewS3(profile), aws.NewIAM(profile)
 
 		// inspect configs
 		if lambda.API.IsExist(fnName) {
@@ -49,11 +47,17 @@ var createCmd = &cobra.Command{
 			fmt.Println(isCreate)
 		}
 
+		// [x] Get IAM Role ARN
+		roleArn := iam.API.Retrieve(ymlConfig.Config.RoleARN)
+		if roleArn[ymlConfig.Config.RoleARN].Arn == "" {
+			log.Fatal("Not Exist Role", ymlConfig.Config.RoleARN)
+		}
+
 		// [x] Create LambdaFunction
 		lambda.API.Create(aws.LambdaInfo{
 			FunctionName: ymlConfig.Config.FunctionName,
 			HandlerName:  "bootstrap",
-			IamRoleArn:   ymlConfig.Config.RoleARN,
+			IamRoleArn:   roleArn[ymlConfig.Config.RoleARN].Arn,
 			DeployPath:   functionPath,
 		})
 

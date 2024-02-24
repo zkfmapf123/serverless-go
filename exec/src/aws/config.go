@@ -5,6 +5,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
@@ -13,12 +14,14 @@ type AWSConfig struct {
 	cfg    aws.Config
 	lambda *lambda.Client
 	s3     *s3.Client
+	iam    *iam.Client
 }
 
 type IAWS[T any] interface {
 	IsExist(name string) bool
 	GetList() map[string]T
 	Create(info T) bool
+	Retrieve(name string) map[string]T
 }
 
 func New(profile string) AWSConfig {
@@ -32,5 +35,6 @@ func New(profile string) AWSConfig {
 		cfg:    cfg,
 		lambda: lambda.NewFromConfig(cfg),
 		s3:     s3.NewFromConfig(cfg),
+		iam:    iam.NewFromConfig(cfg),
 	}
 }

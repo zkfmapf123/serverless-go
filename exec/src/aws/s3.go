@@ -75,3 +75,7 @@ func (s S3Config) Create(info S3Info) bool {
 
 	return true
 }
+
+func (s S3Config) Retrieve(name string) map[string]S3Info {
+	return nil
+}
