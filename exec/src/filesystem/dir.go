@@ -69,3 +69,24 @@ func InjectFileScript(path, filename, txt string) error {
 
 	return nil
 }
+
+func MakeZip(path string) {
+	err := os.Chdir(path)
+	if err != nil {
+		panic(err)
+	}
+
+	envMap := map[string]string{
+		"GOOS":        "linux",
+		"GOARCH":      "arm64",
+		"CGO_ENABLED": "0",
+	}
+
+	for k, v := range envMap {
+		os.Setenv(k, v)
+	}
+
+	interaction.Exec("go", "build", "-tags", "lambda.norpc", "-ldflags", "-s -w", "-o", "bootstrap", "main.go")
+	interaction.Exec("chmod", "+x", "bootstrap")
+	interaction.Exec("zip", "bootstrap.zip", "bootstrap")
+}

@@ -2,6 +2,8 @@ package aws
 
 import (
 	"context"
+	"fmt"
+	"os"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
@@ -14,6 +16,12 @@ type LambdaInfo struct {
 	Env         int
 	Size        float64
 	LastUpdated string
+
+	// Create Config
+	FunctionName string
+	HandlerName  string
+	IamRoleArn   string
+	DeployPath   string
 }
 
 type lambdaConfig struct {
@@ -38,11 +46,8 @@ func (l lambdaConfig) IsExist(name string) bool {
 		FunctionName: aws.String(name),
 	}
 	_, err := l.config.lambda.GetFunction(context.TODO(), input)
-	if err != nil {
-		return false
-	}
 
-	return true
+	return err == nil
 }
 
 func (l lambdaConfig) GetList() map[string]LambdaInfo {
@@ -65,6 +70,31 @@ func (l lambdaConfig) GetList() map[string]LambdaInfo {
 	}
 
 	return funcInfo
+}
+
+func (l lambdaConfig) Create(info LambdaInfo) bool {
+	file, err := os.ReadFile(fmt.Sprintf("%s/%s", info.DeployPath, "bootstrap.zip"))
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = l.config.lambda.CreateFunction(context.TODO(), &lambda.CreateFunctionInput{
+		Code:         &types.FunctionCode{ZipFile: file},
+		FunctionName: aws.String(info.FunctionName),
+		Role:         &info.IamRoleArn,
+		Handler:      aws.String(info.HandlerName),
+		Publish:      true,
+		Runtime:      types.RuntimeProvidedal2023,
+		Architectures: []types.Architecture{
+			types.ArchitectureArm64,
+		},
+	})
+
+	if err != nil {
+		panic(err)
+	}
+
+	return true
 }
 
 func getEnvSize(t *types.EnvironmentResponse) int {

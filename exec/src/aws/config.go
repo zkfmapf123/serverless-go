@@ -18,6 +18,7 @@ type AWSConfig struct {
 type IAWS[T any] interface {
 	IsExist(name string) bool
 	GetList() map[string]T
+	Create(info T) bool
 }
 
 func New(profile string) AWSConfig {

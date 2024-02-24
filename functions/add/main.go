@@ -12,7 +12,7 @@ type MyEvent struct {
 	B int `json:"b"`
 }
 
-func Handler(ctx context.Context, e *MyEvent) (*int, error) {
+func HandleRequest(ctx context.Context, e *MyEvent) (*int, error) {
 	if e == nil {
 		return nil, fmt.Errorf("received nil event %v", e)
 	}
@@ -26,5 +26,5 @@ func add(a, b int) int {
 }
 
 func main() {
-	lambda.Start(Handler)
+	lambda.Start(HandleRequest)
 }

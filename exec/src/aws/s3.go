@@ -3,11 +3,14 @@ package aws
 import (
 	"context"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 )
 
 type S3Info struct {
-	Name string
+	Name   string
+	Region string
 }
 
 type S3Config struct {
@@ -54,4 +57,21 @@ func (s S3Config) GetList() map[string]S3Info {
 	}
 
 	return s3Items
+}
+
+func (s S3Config) Create(info S3Info) bool {
+
+	input := &s3.CreateBucketInput{
+		Bucket: aws.String(info.Name),
+		CreateBucketConfiguration: &types.CreateBucketConfiguration{
+			LocationConstraint: types.BucketLocationConstraint(info.Region),
+		},
+	}
+
+	_, err := s.config.s3.CreateBucket(context.TODO(), input)
+	if err != nil {
+		panic(err)
+	}
+
+	return true
 }

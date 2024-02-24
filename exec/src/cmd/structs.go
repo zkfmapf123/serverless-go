@@ -16,3 +16,11 @@ type FunctionConfig struct {
 	Tags map[string]interface{} `yaml:"tags"`
 	Envs map[string]interface{} `yaml:"envs"`
 }
+
+type GlobalConfig struct {
+	Config struct {
+		StateBucket string `yaml:"state_bucket"`
+		Region      string `yaml:"region"`
+		Profile     string `yaml:"profile"`
+	} `yaml:"configs"`
+}

@@ -25,7 +25,12 @@ var createCmd = &cobra.Command{
 		}
 
 		// get yml config
+		path, _ := os.Getwd()
 		ymlConfig := utils.GetYmlProperties[FunctionConfig](fmt.Sprintf("%s/config.yml", functionPath))
+		globalConfig := utils.GetYmlProperties[GlobalConfig](fmt.Sprintf("%s/agent.yml", path))
+
+		fmt.Println(globalConfig)
+
 		profile, fnName, s3Name := viper.GetString("profile"), ymlConfig.Config.FunctionName, ymlConfig.Config.StateS3Bucket
 		lambda, s3 := aws.NewLambda(profile), aws.NewS3(profile)
 
@@ -34,20 +39,24 @@ var createCmd = &cobra.Command{
 			log.Fatalln(fmt.Sprintf("%s is Already Exist Lambda Function", ymlConfig.Config.FunctionName))
 		}
 
+		// [x] S3가 없으면 생성해야 함
 		if !s3.API.IsExist(s3Name) {
-			log.Fatalln(fmt.Sprintf("%s is Not Exist S3 Bucket", ymlConfig.Config.StateS3Bucket))
+			isCreate := s3.API.Create(aws.S3Info{
+				Name:   s3Name,
+				Region: globalConfig.Config.Region,
+			})
+
+			fmt.Println(isCreate)
 		}
 
-		if filesystem.IsExist(functionPath, "terraform") {
-			log.Fatalln("Terraform 파일이 이미 존재합니다")
-		}
+		// [x] Create LambdaFunction
+		lambda.API.Create(aws.LambdaInfo{
+			FunctionName: ymlConfig.Config.FunctionName,
+			HandlerName:  "bootstrap",
+			IamRoleArn:   ymlConfig.Config.RoleARN,
+			DeployPath:   functionPath,
+		})
 
-		err := filesystem.InjectFileScript(functionPath, "main.tf", `
-			hello world
-		`)
-		if err != nil {
-			panic(err)
-		}
 	},
 }
 
