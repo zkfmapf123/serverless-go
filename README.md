@@ -28,15 +28,6 @@
 - [ ] Deploy Lambda
 - [ ] Rollback Lambda + S3 Versioning
 
-## 추후 추가되야 할 작업
-
-- Lambda를 만들어주는건 아직안됨 -> 테라폼으로 관리할수있도록 해야 함
-
-  - 테라폼으로 만들어주되, output 할 수 있도록
-  - state bucket도 yml에서 추출하자...
-
-- 현재는 S3 + zip 형태로 하지만, 추후에는 Dockerfile로도 배포할수있도록 해야함
-
 ## Dependency
 
 - <a href="https://registry.terraform.io/modules/zkfmapf123/lambda/lee/latest">Terraform Lambda Module</a>
