@@ -98,7 +98,33 @@ func (l lambdaConfig) Create(info LambdaInfo) bool {
 }
 
 func (l lambdaConfig) Retrieve(name string) map[string]LambdaInfo {
-	return nil
+	_, err := l.config.lambda.GetFunction(context.TODO(), &lambda.GetFunctionInput{
+		FunctionName: aws.String(name),
+	})
+
+	if err != nil {
+		return nil
+	}
+
+	return map[string]LambdaInfo{
+		name: {
+			FunctionName: name,
+		},
+	}
+}
+
+func (l lambdaConfig) Delete(name string) error {
+
+	LambdaName := l.Retrieve(name)
+	if LambdaName[name].FunctionName == "" {
+		return fmt.Errorf("not exists %s", name)
+	}
+
+	_, err := l.config.lambda.DeleteFunction(context.TODO(), &lambda.DeleteFunctionInput{
+		FunctionName: aws.String(name),
+	})
+
+	return err
 }
 
 func getEnvSize(t *types.EnvironmentResponse) int {

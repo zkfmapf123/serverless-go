@@ -22,6 +22,7 @@ type IAWS[T any] interface {
 	GetList() map[string]T
 	Create(info T) bool
 	Retrieve(name string) map[string]T
+	Delete(name string) error
 }
 
 func New(profile string) AWSConfig {

@@ -24,10 +24,13 @@
 
 - [x] Lambda Dashboard
 - [x] Create Lambda
-- [ ] Delete Lambda
+- [x] Delete Lambda
 - [ ] Deploy Lambda
+  - [ ] Versioning S3
+  - [ ] Deploy
 - [ ] Rollback Lambda + S3 Versioning
 
 ## Dependency
 
 - <a href="https://registry.terraform.io/modules/zkfmapf123/lambda/lee/latest">Terraform Lambda Module</a>
+- <a href="https://docs.aws.amazon.com/ko_kr/code-library/latest/ug/go_2_iam_code_examples.html"> aws-sdk-v2-golang lib </a>
