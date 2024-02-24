@@ -23,12 +23,10 @@
 ## 완료된 기능
 
 - [x] Lambda Dashboard
-- [ ] Create Lambda ( use Terraform ) <- 작업중
-  - 테라폼 작성하고 file에 떨궈줘야 함
-- [ ] Output Terraform in Lambda Function File
-- [ ] Deploy Lambda
-- [ ] Rollback Lambda
+- [x] Create Lambda
 - [ ] Delete Lambda
+- [ ] Deploy Lambda
+- [ ] Rollback Lambda + S3 Versioning
 
 ## 추후 추가되야 할 작업
 
