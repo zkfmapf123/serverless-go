@@ -2,8 +2,6 @@
 configs:
   state_s3_bucket: lambda-dk-s3-bucket
   role_arn: Basic-Lambda-Role
-  filename: function.zip
-  handler: handler.go
   function_name: add_function
 
 ## Required
