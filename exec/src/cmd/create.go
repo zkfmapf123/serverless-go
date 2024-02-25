@@ -59,8 +59,13 @@ var createCmd = &cobra.Command{
 			HandlerName:  "bootstrap",
 			IamRoleArn:   roleArn[ymlConfig.Config.RoleARN].Arn,
 			DeployPath:   functionPath,
+			EnvList:      ymlConfig.Envs,
+			TagList:      ymlConfig.Tags,
+			HandlerConfig: aws.HandlerConfigInfo{
+				Timeout:    ymlConfig.HandlerConfig.Timeout,
+				MemorySize: ymlConfig.HandlerConfig.MemorySize,
+			},
 		})
-
 	},
 }
 

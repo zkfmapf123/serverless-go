@@ -10,15 +10,14 @@ configs:
 handler_config:
   timeout: 60
   memory_size: 128
-  runtime: go1.20
 
-## Required
+## Required (Only Uppercase)
 tags:
   Env: test
 
-## Required
+## Required (Only Uppercase)
 envs:
-  a: 10
-  b: 20
-  c: 30
-  d: 40
+  varA: 10
+  varB: 20
+  varC: 30
+  varD: 40

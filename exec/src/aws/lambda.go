@@ -3,7 +3,11 @@ package aws
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
+	"reflect"
+	"strconv"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
@@ -11,17 +15,26 @@ import (
 	"github.com/zkfmapf123/serverless-go-deploy-agent/src/utils"
 )
 
+type HandlerConfigInfo struct {
+	Timeout    string
+	MemorySize string
+	// Runtime    string ## deprecated
+}
+
 type LambdaInfo struct {
 	Desc        string
-	Env         int
+	Env         int // envSize
 	Size        float64
 	LastUpdated string
 
 	// Create Config
-	FunctionName string
-	HandlerName  string
-	IamRoleArn   string
-	DeployPath   string
+	FunctionName  string
+	HandlerName   string
+	IamRoleArn    string
+	DeployPath    string
+	EnvList       map[string]interface{}
+	TagList       map[string]interface{}
+	HandlerConfig HandlerConfigInfo
 }
 
 type lambdaConfig struct {
@@ -78,6 +91,9 @@ func (l lambdaConfig) Create(info LambdaInfo) bool {
 		panic(err)
 	}
 
+	timeout, _ := strconv.Atoi(info.HandlerConfig.Timeout)
+	memorySize, _ := strconv.Atoi(info.HandlerConfig.MemorySize)
+
 	_, err = l.config.lambda.CreateFunction(context.TODO(), &lambda.CreateFunctionInput{
 		Code:         &types.FunctionCode{ZipFile: file},
 		FunctionName: aws.String(info.FunctionName),
@@ -88,6 +104,12 @@ func (l lambdaConfig) Create(info LambdaInfo) bool {
 		Architectures: []types.Architecture{
 			types.ArchitectureArm64,
 		},
+		Environment: &types.Environment{
+			Variables: makeLamdaConfigValues(info.EnvList),
+		},
+		Tags:       makeLamdaConfigValues(info.TagList),
+		Timeout:    aws.Int32(int32(timeout)),
+		MemorySize: aws.Int32(int32(memorySize)),
 	})
 
 	if err != nil {
@@ -134,4 +156,30 @@ func getEnvSize(t *types.EnvironmentResponse) int {
 	}
 
 	return len(t.Variables)
+}
+
+// Envs, Tags
+func makeLamdaConfigValues(value map[string]interface{}) map[string]string {
+	m := make(map[string]string)
+
+	for k, v := range value {
+		k = strings.ToUpper(k)
+
+		switch reflect.TypeOf(v).Kind() {
+		case reflect.Bool:
+			if v.(bool) {
+				m[k] = "true"
+			} else {
+				m[k] = "false"
+			}
+		case reflect.Int:
+			i := strconv.Itoa(v.(int))
+			m[k] = i
+		case reflect.String:
+			m[k] = v.(string)
+		default:
+			log.Fatalf("%s is invalid type", reflect.TypeOf(k).String())
+		}
+	}
+	return m
 }

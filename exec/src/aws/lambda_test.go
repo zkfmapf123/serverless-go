@@ -26,3 +26,21 @@ func TestIsExist(t *testing.T) {
 	assert.Equal(t, isExist_1, true)
 	assert.Equal(t, isExist_2, false)
 }
+
+func TestMakeEnvValues(t *testing.T) {
+	m := map[string]interface{}{
+		"a": "10",
+		"b": 10,
+		"c": true,
+	}
+
+	res := makeLamdaConfigValues(m, false)
+	res2 := makeLamdaConfigValues(m, true)
+
+	assert.Equal(t, res["a"], "10")
+	assert.Equal(t, res2["A"], "10")
+
+	assert.Equal(t, res["b"], "10")
+	assert.Equal(t, res["c"], "true")
+
+}
