@@ -34,8 +34,8 @@ func TestMakeEnvValues(t *testing.T) {
 		"c": true,
 	}
 
-	res := makeLamdaConfigValues(m, false)
-	res2 := makeLamdaConfigValues(m, true)
+	res := makeLamdaConfigValues(m)
+	res2 := makeLamdaConfigValues(m)
 
 	assert.Equal(t, res["a"], "10")
 	assert.Equal(t, res2["A"], "10")

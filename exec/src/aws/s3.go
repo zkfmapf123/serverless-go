@@ -83,3 +83,7 @@ func (s S3Config) Retrieve(name string) map[string]S3Info {
 func (s S3Config) Delete(name string) error {
 	return nil
 }
+
+func (s S3Config) Deploy(info S3Info) error {
+	return nil
+}

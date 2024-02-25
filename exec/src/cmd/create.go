@@ -34,17 +34,17 @@ var createCmd = &cobra.Command{
 
 		// inspect configs
 		if lambda.API.IsExist(fnName) {
-			log.Fatalln(fmt.Sprintf("%s is Already Exist Lambda Function", ymlConfig.Config.FunctionName))
+			log.Fatalf("%s is Already Exist Lambda Function", ymlConfig.Config.FunctionName)
 		}
 
 		// [x] S3가 없으면 생성해야 함
 		if !s3.API.IsExist(s3Name) {
-			isCreate := s3.API.Create(aws.S3Info{
+			s3.API.Create(aws.S3Info{
 				Name:   s3Name,
 				Region: globalConfig.Config.Region,
 			})
 
-			fmt.Println(isCreate)
+			fmt.Printf("%s bucket Create", s3Name)
 		}
 
 		// [x] Get IAM Role ARN
@@ -54,6 +54,7 @@ var createCmd = &cobra.Command{
 		}
 
 		// [x] Create LambdaFunction
+		filesystem.MakeZip(functionPath)
 		lambda.API.Create(aws.LambdaInfo{
 			FunctionName: ymlConfig.Config.FunctionName,
 			HandlerName:  "bootstrap",
@@ -66,6 +67,8 @@ var createCmd = &cobra.Command{
 				MemorySize: ymlConfig.HandlerConfig.MemorySize,
 			},
 		})
+
+		fmt.Printf("Deploy Success %s", ymlConfig.Config.FunctionName)
 	},
 }
 

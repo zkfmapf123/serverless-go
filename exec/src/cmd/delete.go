@@ -13,7 +13,7 @@ import (
 )
 
 var deleteCmd = &cobra.Command{
-	Use:   "dep",
+	Use:   "de",
 	Short: "Delete Lambda Function",
 	Long:  "Delete Lambda Function",
 	Run: func(cmd *cobra.Command, args []string) {

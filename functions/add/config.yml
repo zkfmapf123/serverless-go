@@ -17,7 +17,5 @@ tags:
 
 ## Required (Only Uppercase)
 envs:
-  varA: 10
-  varB: 20
-  varC: 30
-  varD: 40
+  var_A: 10
+  var_B: 20

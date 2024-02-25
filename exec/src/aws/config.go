@@ -23,6 +23,7 @@ type IAWS[T any] interface {
 	Create(info T) bool
 	Retrieve(name string) map[string]T
 	Delete(name string) error
+	Deploy(info T) error
 }
 
 func New(profile string) AWSConfig {

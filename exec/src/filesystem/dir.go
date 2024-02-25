@@ -1,7 +1,6 @@
 package filesystem
 
 import (
-	"fmt"
 	"os"
 	"strings"
 
@@ -54,22 +53,6 @@ func IsExist(path, name string) bool {
 	return false
 }
 
-func InjectFileScript(path, filename, txt string) error {
-	file, err := os.Create(fmt.Sprintf("%s/%s", path, filename))
-	if err != nil {
-		return err
-	}
-
-	defer file.Close()
-
-	_, err = file.WriteString(txt)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func MakeZip(path string) {
 	err := os.Chdir(path)
 	if err != nil {
@@ -86,6 +69,7 @@ func MakeZip(path string) {
 		os.Setenv(k, v)
 	}
 
+	interaction.Exec("rm", "-rf", "bootstrap", "*.zip")
 	interaction.Exec("go", "build", "-tags", "lambda.norpc", "-ldflags", "-s -w", "-o", "bootstrap", "main.go")
 	interaction.Exec("chmod", "+x", "bootstrap")
 	interaction.Exec("zip", "bootstrap.zip", "bootstrap")

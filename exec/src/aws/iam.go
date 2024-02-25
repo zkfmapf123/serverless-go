@@ -63,3 +63,7 @@ func (i IamConfig) Retrieve(name string) map[string]IamInfo {
 func (i IamConfig) Delete(name string) error {
 	return nil
 }
+
+func (i IamConfig) Deploy(info IamInfo) error {
+	return nil
+}

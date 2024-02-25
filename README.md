@@ -1,6 +1,9 @@
 # Serverless-go-deploy-agent
 
-## 초기설정
+## Desc
+- Lambda 함수 생성 / 삭제 / 배포 Agent
+
+## 실행방법
 
 ```sh
   make build
@@ -26,9 +29,52 @@
 - [x] Create Lambda
 - [x] Delete Lambda
 - [ ] Deploy Lambda
-  - [ ] Versioning S3
-  - [ ] Deploy
-- [ ] Rollback Lambda + S3 Versioning
+  - [x] 간단한 배포
+  - [ ] 세부사항 변경 하는 배포
+  - [ ] Versioning S3 + 배포
+- [ ] Rollback Lambda
+
+## 사용방법
+
+1. Global Setting (yaml)
+
+- Global Setting 값은 agent.yml을 활용합니다.
+
+```yml
+configs:
+  state_bucket: dk-s3-lambda-state ## Required
+  region: ap-northeast-2 ## Required
+  profile: default ## Required
+```
+
+2. 함수 Setting (yaml)
+- 람다함수 생성 / 배포에 필요한 구성을 정의합니다.
+- Tag는 Pascal Case로 치환됩니다.
+- 환경변수는 Uppercase로 치환됩니다.
+
+```yml
+## Required
+configs:
+  state_s3_bucket: lambda-dk-s3-bucket
+  role_arn: Basic-Lambda-Role
+  filename: function.zip
+  handler: handler.go
+  function_name: add_function
+
+## Required
+handler_config:
+  timeout: 60
+  memory_size: 128
+
+## Required (Only Uppercase)
+tags:
+  Env: test
+
+## Required (Only Uppercase)
+envs:
+  var_A: 10
+  var_B: 20
+```
 
 ## Dependency
 

@@ -8,11 +8,12 @@ import (
 )
 
 type MyEvent struct {
-	A int `json:"a"`
-	B int `json:"b"`
+	A int `json:"VAR_A"`
+	B int `json:"VAR_B"`
 }
 
 func HandleRequest(ctx context.Context, e *MyEvent) (*int, error) {
+	fmt.Println(e)
 	if e == nil {
 		return nil, fmt.Errorf("received nil event %v", e)
 	}

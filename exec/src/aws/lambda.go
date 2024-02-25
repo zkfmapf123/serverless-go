@@ -105,9 +105,9 @@ func (l lambdaConfig) Create(info LambdaInfo) bool {
 			types.ArchitectureArm64,
 		},
 		Environment: &types.Environment{
-			Variables: makeLamdaConfigValues(info.EnvList),
+			Variables: makeLamdaConfigValues(info.EnvList, false),
 		},
-		Tags:       makeLamdaConfigValues(info.TagList),
+		Tags:       makeLamdaConfigValues(info.TagList, true),
 		Timeout:    aws.Int32(int32(timeout)),
 		MemorySize: aws.Int32(int32(memorySize)),
 	})
@@ -117,6 +117,28 @@ func (l lambdaConfig) Create(info LambdaInfo) bool {
 	}
 
 	return true
+}
+
+// [x] 간단한 배포 (함수 코드만)
+// [ ] 세부사항 변경 배포
+// [ ] S3 Versioning
+func (l lambdaConfig) Deploy(info LambdaInfo) error {
+	lambdaName := l.Retrieve(info.FunctionName)
+	if lambdaName[info.FunctionName].FunctionName == "" {
+		return fmt.Errorf("not exists %s", info.FunctionName)
+	}
+
+	file, err := os.ReadFile(fmt.Sprintf("%s/%s", info.DeployPath, "bootstrap.zip"))
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = l.config.lambda.UpdateFunctionCode(context.TODO(), &lambda.UpdateFunctionCodeInput{
+		FunctionName: aws.String(info.FunctionName),
+		ZipFile:      file,
+	})
+
+	return err
 }
 
 func (l lambdaConfig) Retrieve(name string) map[string]LambdaInfo {
@@ -159,11 +181,16 @@ func getEnvSize(t *types.EnvironmentResponse) int {
 }
 
 // Envs, Tags
-func makeLamdaConfigValues(value map[string]interface{}) map[string]string {
+func makeLamdaConfigValues(value map[string]interface{}, isPascal bool) map[string]string {
 	m := make(map[string]string)
 
 	for k, v := range value {
-		k = strings.ToUpper(k)
+
+		if isPascal {
+			k = strings.Title(k)
+		} else {
+			k = strings.ToUpper(k)
+		}
 
 		switch reflect.TypeOf(v).Kind() {
 		case reflect.Bool:
