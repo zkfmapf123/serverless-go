@@ -1,4 +1,3 @@
 configs:
-  state_bucket: dk-s3-lambda-state 
   region: ap-northeast-2
   profile: default

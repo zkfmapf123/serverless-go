@@ -35,6 +35,12 @@ type LambdaInfo struct {
 	EnvList       map[string]interface{}
 	TagList       map[string]interface{}
 	HandlerConfig HandlerConfigInfo
+
+	// Config
+	LogGroupUrl    string
+	RepositoryType string // s3 | ecr
+	Role           string
+	MemorySize     int32
 }
 
 type lambdaConfig struct {
@@ -45,10 +51,10 @@ type NewLambdaAPI struct {
 	API IAWS[LambdaInfo]
 }
 
-func NewLambda(profile string) NewLambdaAPI {
+func NewLambda(profile string, region string) NewLambdaAPI {
 	return NewLambdaAPI{
 		API: lambdaConfig{
-			config: New(profile),
+			config: New(profile, region),
 		},
 	}
 }
@@ -65,8 +71,7 @@ func (l lambdaConfig) IsExist(name string) bool {
 
 func (l lambdaConfig) GetList() map[string]LambdaInfo {
 
-	listInput := &lambda.ListFunctionsInput{}
-	res, err := l.config.lambda.ListFunctions(context.TODO(), listInput)
+	res, err := l.config.lambda.ListFunctions(context.TODO(), &lambda.ListFunctionsInput{})
 	if err != nil {
 		panic(err)
 	}
@@ -124,7 +129,7 @@ func (l lambdaConfig) Create(info LambdaInfo) bool {
 // [ ] S3 Versioning
 func (l lambdaConfig) Deploy(info LambdaInfo) error {
 	lambdaName := l.Retrieve(info.FunctionName)
-	if lambdaName[info.FunctionName].FunctionName == "" {
+	if lambdaName.FunctionName == "" {
 		return fmt.Errorf("not exists %s", info.FunctionName)
 	}
 
@@ -141,26 +146,29 @@ func (l lambdaConfig) Deploy(info LambdaInfo) error {
 	return err
 }
 
-func (l lambdaConfig) Retrieve(name string) map[string]LambdaInfo {
-	_, err := l.config.lambda.GetFunction(context.TODO(), &lambda.GetFunctionInput{
+func (l lambdaConfig) Retrieve(name string) LambdaInfo {
+	output, err := l.config.lambda.GetFunction(context.TODO(), &lambda.GetFunctionInput{
 		FunctionName: aws.String(name),
 	})
 
 	if err != nil {
-		return nil
+		return LambdaInfo{}
 	}
 
-	return map[string]LambdaInfo{
-		name: {
-			FunctionName: name,
-		},
+	return LambdaInfo{
+		FunctionName:   name,
+		LogGroupUrl:    *output.Configuration.LoggingConfig.LogGroup,
+		RepositoryType: *output.Code.RepositoryType,
+		Role:           *output.Configuration.Role,
+		LastUpdated:    *output.Configuration.LastModified,
+		MemorySize:     *output.Configuration.MemorySize,
 	}
 }
 
 func (l lambdaConfig) Delete(name string) error {
 
 	LambdaName := l.Retrieve(name)
-	if LambdaName[name].FunctionName == "" {
+	if LambdaName.FunctionName == "" {
 		return fmt.Errorf("not exists %s", name)
 	}
 

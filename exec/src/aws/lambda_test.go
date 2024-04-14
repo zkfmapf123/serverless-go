@@ -1,21 +1,24 @@
 package aws
 
-// import (
-// 	"testing"
+import (
+	"testing"
 
-// 	"github.com/stretchr/testify/assert"
-// )
+	"github.com/stretchr/testify/assert"
+)
 
-// var TEST_PROFILE = "test"
+const (
+	TEST_PROFILE = "test"
+	TEST_REGION  = "ap-northeast-2"
+)
 
-// func TestGetLambdaList(t *testing.T) {
-// 	client := NewLambda(TEST_PROFILE)
-// 	list := client.API.GetList()
+func TestGetLambdaList(t *testing.T) {
+	client := NewLambda(TEST_PROFILE, TEST_REGION)
+	list := client.API.GetList()
 
-// 	if list == nil {
-// 		t.Errorf("%v is error", list)
-// 	}
-// }
+	if list == nil {
+		t.Errorf("%v is error", list)
+	}
+}
 
 // func TestIsExist(t *testing.T) {
 // 	client := NewLambda(TEST_PROFILE)
@@ -43,3 +46,14 @@ package aws
 // 	assert.Equal(t, res["b"], "10")
 // 	assert.Equal(t, res["c"], "true")
 // }
+
+func Test_Retrive(t *testing.T) {
+	client := NewLambda(TEST_PROFILE, TEST_REGION)
+	info := client.API.Retrieve("add_function")
+
+	assert.NotNil(t, info.FunctionName, true)
+	assert.NotNil(t, info.RepositoryType, true)
+	assert.NotNil(t, info.Role, true)
+	assert.NotNil(t, info.LastUpdated, true)
+	assert.NotNil(t, info.MemorySize, true)
+}

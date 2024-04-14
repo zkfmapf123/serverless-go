@@ -23,9 +23,9 @@ var deleteCmd = &cobra.Command{
 			os.Exit(0)
 		}
 		ymlConfig := utils.GetYmlProperties[FunctionConfig](fmt.Sprintf("%s/config.yml", functionPath))
-		profile, fnName, _ := viper.GetString("profile"), ymlConfig.Config.FunctionName, ymlConfig.Config.StateS3Bucket
+		profile, region, fnName, _ := viper.GetString("profile"), viper.GetString("region"), ymlConfig.Config.FunctionName, ymlConfig.Config.StateS3Bucket
 
-		lambda := aws.NewLambda(profile)
+		lambda := aws.NewLambda(profile, region)
 		err := lambda.API.Delete(fnName)
 		if err != nil {
 			log.Fatalln("Dont't Delete ", err)

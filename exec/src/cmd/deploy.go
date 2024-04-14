@@ -27,8 +27,8 @@ var deployCmd = &cobra.Command{
 		ymlConfig := utils.GetYmlProperties[FunctionConfig](fmt.Sprintf("%s/config.yml", functionPath))
 		globalConfig := utils.GetYmlProperties[GlobalConfig](fmt.Sprintf("%s/agent.yml", path))
 
-		profile, fnName, s3Name := viper.GetString("profile"), ymlConfig.Config.FunctionName, ymlConfig.Config.StateS3Bucket
-		lambda, s3 := aws.NewLambda(profile), aws.NewS3(profile)
+		profile, region, fnName, s3Name := viper.GetString("profile"), viper.GetString("region"), ymlConfig.Config.FunctionName, ymlConfig.Config.StateS3Bucket
+		lambda, s3 := aws.NewLambda(profile, region), aws.NewS3(profile, region)
 
 		// inspect configs
 		if !lambda.API.IsExist(fnName) {

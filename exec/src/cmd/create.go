@@ -25,50 +25,47 @@ var createCmd = &cobra.Command{
 		}
 
 		// get yml config
-		path, _ := os.Getwd()
 		ymlConfig := utils.GetYmlProperties[FunctionConfig](fmt.Sprintf("%s/config.yml", functionPath))
-		globalConfig := utils.GetYmlProperties[GlobalConfig](fmt.Sprintf("%s/agent.yml", path))
-
-		profile, fnName, s3Name := viper.GetString("profile"), ymlConfig.Config.FunctionName, ymlConfig.Config.StateS3Bucket
-		lambda, s3, iam := aws.NewLambda(profile), aws.NewS3(profile), aws.NewIAM(profile)
+		profile, region, fnName := viper.GetString("profile"), viper.GetString("region"), ymlConfig.Config.FunctionName
+		lambda, iam := aws.NewLambda(profile, region), aws.NewIAM(profile, region)
 
 		// inspect configs
+		isExist := false
 		if lambda.API.IsExist(fnName) {
-			log.Fatalf("%s is Already Exist Lambda Function", ymlConfig.Config.FunctionName)
+			log.Printf("%s is Already Exist Lambda Function", ymlConfig.Config.FunctionName)
+			isExist = true
 		}
 
-		// [x] S3가 없으면 생성해야 함
-		if !s3.API.IsExist(s3Name) {
-			s3.API.Create(aws.S3Info{
-				Name:   s3Name,
-				Region: globalConfig.Config.Region,
-			})
-
-			fmt.Printf("%s bucket Create", s3Name)
-		}
-
-		// [x] Get IAM Role ARN
+		// [ ] Get IAM Role ARN
 		roleArn := iam.API.Retrieve(ymlConfig.Config.RoleARN)
-		if roleArn[ymlConfig.Config.RoleARN].Arn == "" {
-			log.Fatal("Not Exist Role", ymlConfig.Config.RoleARN)
+		if roleArn.Arn == "" {
+			log.Fatalf("%s is Not Exist", roleArn.Name)
 		}
 
-		// [x] Create LambdaFunction
-		filesystem.MakeZip(functionPath)
-		lambda.API.Create(aws.LambdaInfo{
-			FunctionName: ymlConfig.Config.FunctionName,
-			HandlerName:  "bootstrap",
-			IamRoleArn:   roleArn[ymlConfig.Config.RoleARN].Arn,
-			DeployPath:   functionPath,
-			EnvList:      ymlConfig.Envs,
-			TagList:      ymlConfig.Tags,
-			HandlerConfig: aws.HandlerConfigInfo{
-				Timeout:    ymlConfig.HandlerConfig.Timeout,
-				MemorySize: ymlConfig.HandlerConfig.MemorySize,
-			},
-		})
+		if !isExist {
+			// [x] Create LambdaFunction
+			filesystem.MakeZip(functionPath)
+			lambda.API.Create(aws.LambdaInfo{
+				FunctionName: ymlConfig.Config.FunctionName,
+				HandlerName:  "bootstrap",
+				IamRoleArn:   roleArn.Arn,
+				DeployPath:   functionPath,
+				EnvList:      ymlConfig.Envs,
+				TagList:      ymlConfig.Tags,
+				HandlerConfig: aws.HandlerConfigInfo{
+					Timeout:    ymlConfig.HandlerConfig.Timeout,
+					MemorySize: ymlConfig.HandlerConfig.MemorySize,
+				},
+			})
+		}
 
-		fmt.Printf("Deploy Success %s", ymlConfig.Config.FunctionName)
+		defer func() {
+
+			info := lambda.API.Retrieve(ymlConfig.Config.FunctionName)
+			fmt.Printf(`FunctionName : %s\nRepositoryType : %s\nRoleArn : %s\nLastModified : %s\nMemorySize : %d\n`, info.FunctionName, info.RepositoryType, info.Role, info.LastUpdated, info.MemorySize)
+		}()
+
+		fmt.Printf("Deploy Success %s\n", ymlConfig.Config.FunctionName)
 	},
 }
 
