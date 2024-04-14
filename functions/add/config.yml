@@ -1,7 +1,6 @@
 ## Required
 configs:
-  state_s3_bucket: lambda-dk-s3-bucket
-  role_arn: Basic-Lambda-Role
+  role_arn: lambda-common-role
   function_name: add_function
 
 ## Required

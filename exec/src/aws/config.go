@@ -21,14 +21,14 @@ type IAWS[T any] interface {
 	IsExist(name string) bool
 	GetList() map[string]T
 	Create(info T) bool
-	Retrieve(name string) map[string]T
+	Retrieve(name string) T
 	Delete(name string) error
 	Deploy(info T) error
 }
 
-func New(profile string) AWSConfig {
+func New(profile string, region string) AWSConfig {
 	cfg, err := config.LoadDefaultConfig(context.TODO(),
-		config.WithSharedConfigProfile(profile))
+		config.WithSharedConfigProfile(profile), config.WithRegion(region))
 	if err != nil {
 		panic(err)
 	}

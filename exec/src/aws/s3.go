@@ -21,10 +21,10 @@ type NewS3API struct {
 	API IAWS[S3Info]
 }
 
-func NewS3(profile string) NewS3API {
+func NewS3(profile, region string) NewS3API {
 	return NewS3API{
 		API: S3Config{
-			config: New(profile),
+			config: New(profile, region),
 		},
 	}
 }
@@ -76,8 +76,8 @@ func (s S3Config) Create(info S3Info) bool {
 	return true
 }
 
-func (s S3Config) Retrieve(name string) map[string]S3Info {
-	return nil
+func (s S3Config) Retrieve(name string) S3Info {
+	return S3Info{}
 }
 
 func (s S3Config) Delete(name string) error {
