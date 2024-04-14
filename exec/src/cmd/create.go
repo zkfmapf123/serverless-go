@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/cheggaaa/pb/v3"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zkfmapf123/serverless-go-deploy-agent/src/aws"
@@ -42,6 +43,8 @@ var createCmd = &cobra.Command{
 			log.Fatalf("%s is Not Exist", roleArn.Name)
 		}
 
+		bar := pb.New(1)
+		bar.Start()
 		if !isExist {
 			// [x] Create LambdaFunction
 			filesystem.MakeZip(functionPath)
@@ -57,15 +60,18 @@ var createCmd = &cobra.Command{
 					MemorySize: ymlConfig.HandlerConfig.MemorySize,
 				},
 			})
+
+			bar.Increment()
 		}
 
 		defer func() {
 
 			info := lambda.API.Retrieve(ymlConfig.Config.FunctionName)
-			fmt.Printf(`FunctionName : %s\nRepositoryType : %s\nRoleArn : %s\nLastModified : %s\nMemorySize : %d\n`, info.FunctionName, info.RepositoryType, info.Role, info.LastUpdated, info.MemorySize)
+			fmt.Printf("FunctionName : %s\nRepositoryType : %s\nRoleArn : %s\nLastModified : %s\nMemorySize : %d\n", info.FunctionName, info.RepositoryType, info.Role, info.LastUpdated, info.MemorySize)
 		}()
 
-		fmt.Printf("Deploy Success %s\n", ymlConfig.Config.FunctionName)
+		bar.Finish()
+		fmt.Printf("Create Success %s\n", ymlConfig.Config.FunctionName)
 	},
 }
 

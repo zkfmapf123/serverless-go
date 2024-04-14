@@ -17,32 +17,20 @@ var deployCmd = &cobra.Command{
 	Short: "deploy Lambda Function",
 	Long:  "deploy Lambda",
 	Run: func(cmd *cobra.Command, args []string) {
+
 		functionPath, isExit := filesystem.SelectBoxDirectory(viper.GetString("path"))
 		if isExit {
 			os.Exit(0)
 		}
 
 		// get yml config
-		path, _ := os.Getwd()
 		ymlConfig := utils.GetYmlProperties[FunctionConfig](fmt.Sprintf("%s/config.yml", functionPath))
-		globalConfig := utils.GetYmlProperties[GlobalConfig](fmt.Sprintf("%s/agent.yml", path))
-
-		profile, region, fnName, s3Name := viper.GetString("profile"), viper.GetString("region"), ymlConfig.Config.FunctionName, ymlConfig.Config.StateS3Bucket
-		lambda, s3 := aws.NewLambda(profile, region), aws.NewS3(profile, region)
+		profile, region, fnName := viper.GetString("profile"), viper.GetString("region"), ymlConfig.Config.FunctionName
+		lambda := aws.NewLambda(profile, region)
 
 		// inspect configs
 		if !lambda.API.IsExist(fnName) {
 			log.Fatalf("%s is Not Exist Lambda Function", ymlConfig.Config.FunctionName)
-		}
-
-		// [x] S3가 없으면 생성해야 함
-		if !s3.API.IsExist(s3Name) {
-			s3.API.Create(aws.S3Info{
-				Name:   s3Name,
-				Region: globalConfig.Config.Region,
-			})
-
-			fmt.Printf("%s bucket Create", s3Name)
 		}
 
 		filesystem.MakeZip(functionPath)
@@ -54,6 +42,14 @@ var deployCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalln(err)
 		}
+
+		defer func() {
+			info := lambda.API.Retrieve(ymlConfig.Config.FunctionName)
+			fmt.Printf("FunctionName : %s\nRepositoryType : %s\nRoleArn : %s\nLastModified : %s\nMemorySize : %d\n", info.FunctionName, info.RepositoryType, info.Role, info.LastUpdated, info.MemorySize)
+		}()
+
+		fmt.Printf("Deploy Success %s\n", ymlConfig.Config.FunctionName)
+
 	},
 }
 
