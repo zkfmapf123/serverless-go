@@ -4,8 +4,5 @@ build:
 run: build
 	./agent
 
-test:
-	@cd exec && go test ./... -v
-
-test-w:
-	@cd exec && gow test -v
+test: 
+	@cd exec && go test ./src/... -v

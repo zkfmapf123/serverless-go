@@ -11,6 +11,7 @@ import (
 	"github.com/zkfmapf123/serverless-go-deploy-agent/src/utils"
 )
 
+// Default
 var (
 	PROFILE    = "default"
 	REGION     = "ap-northeast-2"
@@ -48,7 +49,7 @@ func initConfig() {
 		panic(err)
 	}
 
-	inspectParameter(homeDir, viper.GetString("profile"), viper.GetString("region"))
+	InspectParameter(homeDir)
 
 	path, err := os.Getwd()
 	if err != nil {
@@ -58,34 +59,15 @@ func initConfig() {
 	inspectHomeYML(path, YML_PREFIX)
 }
 
-func inspectParameter(homeDir, profile, region string) {
+func InspectParameter(homeDir string) {
 
-	// profile
-	viper.Set("profile", utils.InjectDefaultValueNotExist[string](viper.GetString("profile"), func(v string) bool {
-		if v != "" {
-			return true
-		}
+	cond := func(v string) bool {
+		return v != ""
+	}
 
-		return false
-	}, PROFILE))
-
-	// region
-	viper.Set("region", utils.InjectDefaultValueNotExist[string](viper.GetString("region"), func(v string) bool {
-		if v != "" {
-			return true
-		}
-
-		return false
-	}, REGION))
-
-	// function path
-	viper.Set("path", utils.InjectDefaultValueNotExist[string](viper.GetString("path"), func(v string) bool {
-		if v != "" {
-			return true
-		}
-
-		return false
-	}, PATH))
+	viper.Set("profile", utils.InjectDefaultValueNotExist(viper.GetString("profile"), cond, PROFILE))
+	viper.Set("region", utils.InjectDefaultValueNotExist(viper.GetString("region"), cond, REGION))
+	viper.Set("path", utils.InjectDefaultValueNotExist(viper.GetString("path"), cond, PATH))
 
 	configFilePath := filepath.Join(homeDir, ".aws", "credentials")
 	b, err := os.ReadFile(configFilePath)
